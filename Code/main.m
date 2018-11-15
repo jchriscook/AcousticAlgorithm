@@ -5,7 +5,7 @@ a = PlottingClass;
 % ------------ Inputs ------------- %
 % name of current .mat to be processed
 date = '/18_11_14';
-file = '/11142018_200015_UTC.mat';
+file = '/11152018_000127_UTC.mat';
 % range
 a.Range = [0, 0.25];
 % red lines

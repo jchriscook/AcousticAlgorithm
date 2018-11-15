@@ -57,10 +57,11 @@ classdef PlottingClass
            amp_specx = abs(Yx)/n;
            stem(freq,amp_specx(1:n), '-b');
            xlim([0 100]);
+           ylim([0 0.04]);
            title('Microphone 1: Roof');
            xlabel('Frequency (Hz)');
            ylabel('Linear Magnitude');
-           set(gca,'FontSize',20);
+           %set(gca,'FontSize',20);
       
            subplot(2,2,2)
            Yy = fft(obj.R2);
@@ -70,10 +71,11 @@ classdef PlottingClass
            amp_specy = abs(Yy)/n;
            stem(freq,amp_specy(1:n), '-g');
            xlim([0 100]);
+           ylim([0 0.04]);
            title('Microphone 2: South');
            xlabel('Frequency (Hz)');
            ylabel('Linear Magnitude');
-           set(gca,'FontSize',20);
+           %set(gca,'FontSize',20);
 
            subplot(2,2,[3, 4])
            Yz = fft(obj.R3);
@@ -83,10 +85,11 @@ classdef PlottingClass
            amp_specz = abs(Yz)/n;
            stem(freq,amp_specz(1:n), '-r');
            xlim([0 100]);
+           ylim([0 0.04]);
            title('Microphone 3: North');
            xlabel('Frequency (Hz)');
            ylabel('Linear Magnitude');
-           set(gca,'FontSize',20);
+           %set(gca,'FontSize',20);
            
            % save the figure
            type = '.png';
