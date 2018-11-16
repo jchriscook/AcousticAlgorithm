@@ -13,8 +13,8 @@ a.right = [13,13];
 a.left = [8,8];
 
 % show figures or dont show figures
-show = 1;
-if show == 1
+show = 0;
+if show == 0
     a.figs = 'off';
 else
     a.figs = 'on';

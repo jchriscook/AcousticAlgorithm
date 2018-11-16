@@ -98,7 +98,7 @@ classdef PlottingClass
            loc = strcat(obj.imagedir, 'Images', slash, tog);
            saveas(thisone, loc);
            pause(obj.figs)
-           %close(thisone);
+           close(thisone);
            
        end
        
@@ -194,7 +194,7 @@ classdef PlottingClass
     plot(obj.right, [-120,0],'--r')
     plot(obj.left, [-120,0],'--r', 'HandleVisibility','off')
     legend({'Microphone 1: Roof', 'Microphone 2: South', 'Microphone 3: North', 'Range'}, 'location', 'northwest')
-    set(gca,'FontSize',20);
+    %set(gca,'FontSize',20);
 
     axis([.5 100 -120 0])
 
@@ -204,7 +204,7 @@ classdef PlottingClass
     loc = strcat(obj.imagedir, 'Images', slash, tog);
     saveas(h, loc);
     pause(obj.figs)
-    %close(h);
+    close(h);
       end
         % The function will take the recoded data and plot the values
       function Plotting = Data(obj)
@@ -219,7 +219,7 @@ classdef PlottingClass
         ylim([-1 1])
         xlabel('Time (seconds)')
         ylabel('Pressure [Pa]')
-        set(gca,'FontSize',20);
+        %set(gca,'FontSize',20);
 
         subplot(2,2,2);
         plot(time,obj.R2, '-g')
@@ -227,7 +227,7 @@ classdef PlottingClass
         ylim([-1 1])
         xlabel('Time (seconds)')
         ylabel('Pressure [Pa]')
-        set(gca,'FontSize',20);
+        %set(gca,'FontSize',20);
 
         subplot(2,2,[3,4]);
         plot(time,obj.R3, '-r')
@@ -235,7 +235,7 @@ classdef PlottingClass
         ylim([-1 1])
         xlabel('Time (seconds)')
         ylabel('Pressure [Pa]')
-        set(gca,'FontSize',20);
+        %set(gca,'FontSize',20);
 
         %thisplot = 'rawdata - ';
         type = '.png';
