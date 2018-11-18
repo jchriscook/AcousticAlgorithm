@@ -1,4 +1,10 @@
+*.DS_Store
 *Images/.DS_Store
+*Code/.DS_Store
+*Data/.DS_Store
 *.pdf
 *html/
 *Lab 6/
+*.zip
+*.docx
+*.jpg
