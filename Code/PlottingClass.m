@@ -28,7 +28,7 @@ classdef PlottingClass
    
    methods
        function perform = Perform(obj)
-           % find the total length of the recording
+           %% Fourier Domain - Cook and Weber      
            L = length(obj.R1);
            % the length will always have a certain delta t associated
            timestep = 1200 / L;
@@ -48,47 +48,55 @@ classdef PlottingClass
            thisone = figure;
            set(thisone, 'Visible', obj.figs);
            
-           %Frequency Domain
+          
+           
+           %% Linear Magnitude - Subsection (C&W)
            subplot(2,2,1)
            Yx = fft(obj.R1);
-           n = length(obj.R1)/2;
-           n = ceil(n);
-           freq = linspace(0, FoldingFreq, n);
-           amp_specx = abs(Yx)/n;
-           stem(freq,amp_specx(1:n), '-b');
+           n1 = length(obj.R1)/2;
+           n1 = ceil(n1);
+           freq1 = linspace(0, FoldingFreq, n1);
+           amp_specx = abs(Yx)/n1;
+           db_spec1 = mag2db(amp_specx);
+           stem(freq1,amp_specx(1:n1), '-b');
            xlim([0 100]);
            ylim([0 0.04]);
-           title('Microphone 1: Roof');
-           xlabel('Frequency (Hz)');
-           ylabel('Linear Magnitude');
+           title('Microphone 1: Roof','fontsize',15);
+           xlabel('Frequency (Hz)','fontsize',15);
+           ylabel('Linear Magnitude','fontsize',15);
+           %set(gca,'Ydir','reverse')
            %set(gca,'FontSize',20);
       
            subplot(2,2,2)
            Yy = fft(obj.R2);
-           n = length(obj.R2)/2;
-           n = ceil(n);
-           freq = linspace(0,FoldingFreq,n);
-           amp_specy = abs(Yy)/n;
-           stem(freq,amp_specy(1:n), '-g');
+           n2 = length(obj.R2)/2;
+           n2 = ceil(n2);
+           freq2 = linspace(0,FoldingFreq,n2);
+           amp_specy = abs(Yy)/n2;
+           db_spec2 = mag2db(amp_specy);
+           stem(freq2,amp_specy(1:n2), '-g');
            xlim([0 100]);
            ylim([0 0.04]);
-           title('Microphone 2: South');
-           xlabel('Frequency (Hz)');
-           ylabel('Linear Magnitude');
+           title('Microphone 2: South','fontsize',15);
+           xlabel('Frequency (Hz)','fontsize',15);
+           ylabel('Linear Magnitude','fontsize',15);
+           %set(gca,'Ydir','reverse')
            %set(gca,'FontSize',20);
 
            subplot(2,2,[3, 4])
            Yz = fft(obj.R3);
-           n = length(obj.R3)/2;
-           n = ceil(n);
-           freq = linspace(0,FoldingFreq,n);
-           amp_specz = abs(Yz)/n;
-           stem(freq,amp_specz(1:n), '-r');
+           n3 = length(obj.R3)/2;
+           n3 = ceil(n3);
+           freq3 = linspace(0,FoldingFreq,n3);
+           amp_specz = abs(Yz)/n3;
+           db_spec3 = mag2db(amp_specz);
+           stem(freq3,amp_specz(1:n3), '-r');
            xlim([0 100]);
            ylim([0 0.04]);
-           title('Microphone 3: North');
-           xlabel('Frequency (Hz)');
-           ylabel('Linear Magnitude');
+           title('Microphone 3: North','fontsize',15);
+           xlabel('Frequency (Hz)','fontsize',15);
+           ylabel('Linear Magnitude','fontsize',15);
+           %set(gca,'Ydir','reverse')
            %set(gca,'FontSize',20);
            
            % save the figure
@@ -100,10 +108,51 @@ classdef PlottingClass
            pause(obj.figs)
            close(thisone);
            
+           %% Decibal Magnitude - Subsection (C&W)
+           thisone2 = figure;
+           set(thisone2, 'Visible', obj.figs);
+           
+           
+           subplot(2,2,1)
+           plot(freq1, db_spec1(1:n1), '-b');
+           ylim([-200 0]);
+           xlim([0 100]);
+           title('Microphone 1: Roof','fontsize',15);
+           xlabel('Frequency (Hz)','fontsize',15);
+           ylabel('Decibal Magnitude (dB)','fontsize',15);
+           %set(gca,'FontSize',20);
+      
+           subplot(2,2,2)
+           plot(freq2, db_spec2(1:n2), '-g');
+           ylim([-200 0]);
+           xlim([0 100]);
+           title('Microphone 2: South','fontsize',15);
+           xlabel('Frequency (Hz)','fontsize',15);
+           ylabel('Decibal Magnitude (dB)','fontsize',15);
+           %set(gca,'FontSize',20);
+
+           subplot(2,2,[3, 4])
+           plot(freq3, db_spec3(1:n3), '-r');
+           ylim([-200 0]);
+           xlim([0 100]);
+           title('Microphone 3: North','fontsize',15);
+           xlabel('Frequency (Hz)','fontsize',15);
+           ylabel('Decibal Magnitude (dB)','fontsize',15);
+           %set(gca,'FontSize',20);
+           
+           type = '.png';
+           tog = strcat(obj.newname, ' db', type);
+           slash = '/';
+           loc = strcat(obj.imagedir, 'Images', slash, tog);
+           saveas(thisone2, loc);
+           pause(obj.figs)
+           close(thisone2);
+           
+           
        end
        
       function lowpass = filtering(obj, s, name)
-          %% the controls for the plot
+          %% Lowpass filter (Butterworth) - Elbing
           
           fs = 1000;            % sample frequency
           
@@ -126,7 +175,7 @@ classdef PlottingClass
          s = s(a:b,:);
          t=(0:1/fs:size(s,1)/fs-1/fs)'; 
          
-                 %% Lowpass filter (Butterworth)
+                 % Lowpass filter (Butterworth)
         if Sfilter == 0
             sf = s;
         end
@@ -140,7 +189,7 @@ classdef PlottingClass
                  aa = (seg-1)*dT*fs*(1-Ov)+1; bb = aa+dT*fs-1;
                 Sf =sf(aa:bb,mics);
 
-                %% power spectrum calculation
+                % power spectrum calculation
                 N = length(Sf);
                 xdft = fft(Sf);
                 xdft = xdft(1:N/2+1);
@@ -154,7 +203,7 @@ classdef PlottingClass
                 end
                 RR(:,seg+1) = psdx; 
        
-            %% plot individual spectra
+            % plot individual spectra
             if mics == 1
                 mkr = '--m';
             end
@@ -188,8 +237,9 @@ classdef PlottingClass
         clearvars RR
     end
 
-    xlabel('Frequency (Hz)')
-    ylabel('Power/Frequency (dB/Hz)')
+    xlabel('Frequency (Hz)','fontsize',15)
+    ylabel('Power/Frequency (dB/Hz)','fontsize',15)
+    title('Spectra', 'fontsize',15)
 
     plot(obj.right, [-120,0],'--r')
     plot(obj.left, [-120,0],'--r', 'HandleVisibility','off')
@@ -206,7 +256,7 @@ classdef PlottingClass
     pause(obj.figs)
     close(h);
       end
-        % The function will take the recoded data and plot the values
+        %% Raw Data - Cook and Hartzler
       function Plotting = Data(obj)
         time = .001:.001:1200;
 
@@ -215,26 +265,26 @@ classdef PlottingClass
 
         subplot(2,2,1);
         plot(time,obj.R1, '-b')
-        title('Microphone 1: Roof')
+        title('Microphone 1: Roof', 'fontsize',15)
         ylim([-1 1])
-        xlabel('Time (seconds)')
-        ylabel('Pressure [Pa]')
+        xlabel('Time (seconds)','fontsize',15)
+        ylabel('Pressure [Pa]','fontsize',15)
         %set(gca,'FontSize',20);
 
         subplot(2,2,2);
         plot(time,obj.R2, '-g')
-        title('Microphone 2: South')
+        title('Microphone 2: South', 'fontsize',15)
         ylim([-1 1])
-        xlabel('Time (seconds)')
-        ylabel('Pressure [Pa]')
+        xlabel('Time (seconds)','fontsize',15)
+        ylabel('Pressure [Pa]','fontsize',15)
         %set(gca,'FontSize',20);
 
         subplot(2,2,[3,4]);
         plot(time,obj.R3, '-r')
-        title('Microphone 3: North')
+        title('Microphone 3: North', 'fontsize',15)
         ylim([-1 1])
-        xlabel('Time (seconds)')
-        ylabel('Pressure [Pa]')
+        xlabel('Time (seconds)','fontsize',15)
+        ylabel('Pressure [Pa]','fontsize',15)
         %set(gca,'FontSize',20);
 
         %thisplot = 'rawdata - ';

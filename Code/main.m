@@ -1,7 +1,7 @@
 % initialize the class
 a = PlottingClass;
 
-% !! only change inputs !! %
+
 % ------------ Inputs ------------- %
 % name of current .mat to be processed
 date = '/18_11_14';
