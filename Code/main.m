@@ -7,7 +7,7 @@ a = PlottingClass;
 date = '/18_11_14';
 file = '/11152018_000127_UTC.mat';
 % range
-a.Range = [0, 0.25];
+a.Range = [0.25, 0.50];
 % red lines
 a.right = [13,13];
 a.left = [8,8];

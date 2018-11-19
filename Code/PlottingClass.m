@@ -24,10 +24,36 @@ classdef PlottingClass
       R1
       R2
       R3
+      % the ranged vals
+      Rset
    end
    
    methods
-       function perform = Perform(obj)
+       function setzone = setting(obj, data)
+            % create a time array
+           time = linspace(0, 20, 1200000);
+           
+           if obj.Range(1) == 0
+               begin = 1;
+           else 
+               begin = obj.Range(1);
+           end
+           
+           if obj.Range(2) ~= 1
+               close = obj.Range(2);
+               stop = close * length(time);
+           end
+           start = begin * length(time);
+  
+           if exist('stop') == 1
+               zz = data(start:stop);
+           else
+               zz = data(start:end);
+           end
+           
+           setzone = zz;
+       end
+       function [] = Perform(obj)
            %% Fourier Domain - Cook and Weber      
            L = length(obj.R1);
            % the length will always have a certain delta t associated
@@ -37,9 +63,6 @@ classdef PlottingClass
            % beginning = obj.range(1) * L;
            % stop = obj.range(2) * L;
            % ----- 
-           
-           % create a time array
-           time = linspace(0, 20, 1200000);
            
            % sample rate 
            fs = 1 / timestep;        % Hz !
@@ -52,15 +75,18 @@ classdef PlottingClass
            
            %% Linear Magnitude - Subsection (C&W)
            subplot(2,2,1)
-           Yx = fft(obj.R1);
-           n1 = length(obj.R1)/2;
+           % pass the object into setting method
+           variable = obj.setting(obj.R1);
+           
+           Yx = fft(variable);
+           n1 = length(variable)/2;
            n1 = ceil(n1);
            freq1 = linspace(0, FoldingFreq, n1);
            amp_specx = abs(Yx)/n1;
            db_spec1 = mag2db(amp_specx);
            stem(freq1,amp_specx(1:n1), '-b');
            xlim([0 100]);
-           ylim([0 0.04]);
+           ylim([0 0.05]);
            title('Microphone 1: Roof','fontsize',15);
            xlabel('Frequency (Hz)','fontsize',15);
            ylabel('Linear Magnitude','fontsize',15);
@@ -68,15 +94,18 @@ classdef PlottingClass
            set(gca,'FontSize',12);
       
            subplot(2,2,2)
-           Yy = fft(obj.R2);
-           n2 = length(obj.R2)/2;
+           % pass the object into setting method
+           variable2 = obj.setting(obj.R2);
+           
+           Yy = fft(variable2);
+           n2 = length(variable2)/2;
            n2 = ceil(n2);
            freq2 = linspace(0,FoldingFreq,n2);
            amp_specy = abs(Yy)/n2;
            db_spec2 = mag2db(amp_specy);
            stem(freq2,amp_specy(1:n2), '-g');
            xlim([0 100]);
-           ylim([0 0.04]);
+           ylim([0 0.05]);
            title('Microphone 2: South','fontsize',15);
            xlabel('Frequency (Hz)','fontsize',15);
            ylabel('Linear Magnitude','fontsize',15);
@@ -84,15 +113,18 @@ classdef PlottingClass
            set(gca,'FontSize',12);
 
            subplot(2,2,[3, 4])
-           Yz = fft(obj.R3);
-           n3 = length(obj.R3)/2;
+           % pass the object into setting method
+           variable3 = obj.setting(obj.R3);
+           
+           Yz = fft(variable3);
+           n3 = length(variable3)/2;
            n3 = ceil(n3);
            freq3 = linspace(0,FoldingFreq,n3);
            amp_specz = abs(Yz)/n3;
            db_spec3 = mag2db(amp_specz);
            stem(freq3,amp_specz(1:n3), '-r');
            xlim([0 100]);
-           ylim([0 0.04]);
+           ylim([0 0.05]);
            title('Microphone 3: North','fontsize',15);
            xlabel('Frequency (Hz)','fontsize',15);
            ylabel('Linear Magnitude','fontsize',15);
@@ -138,7 +170,7 @@ classdef PlottingClass
            obj.Putintofiles(thisone2, thisplot);         
        end
        
-      function lowpass = filtering(obj, s, name)
+      function [] = filtering(obj, s, name)
           %% Lowpass filter (Butterworth) - Elbing
           
           fs = 1000;            % sample frequency
@@ -240,14 +272,14 @@ classdef PlottingClass
     obj.Putintofiles(h, thisplot);
       end
         %% Raw Data - Cook and Hartzler
-      function Plotting = Data(obj)
+      function [] = Data(obj)
         time = .001:.001:1200;
 
         l = figure;
         set(l, 'Visible', obj.figs);
 
         subplot(2,2,1);
-        plot(time,obj.R1, '-b')
+        plot(time, obj.R1, '-b')
         title('Microphone 1: Roof', 'fontsize',15)
         ylim([-1 1])
         xlabel('Time (seconds)','fontsize',15)
@@ -255,7 +287,7 @@ classdef PlottingClass
         set(gca,'FontSize',12);
 
         subplot(2,2,2);
-        plot(time,obj.R2, '-g')
+        plot(time, obj.R2, '-g')
         title('Microphone 2: South', 'fontsize',15)
         ylim([-1 1])
         xlabel('Time (seconds)','fontsize',15)
@@ -263,7 +295,7 @@ classdef PlottingClass
         set(gca,'FontSize',12);
 
         subplot(2,2,[3,4]);
-        plot(time,obj.R3, '-r')
+        plot(time, obj.R3, '-r')
         title('Microphone 3: North', 'fontsize',15)
         ylim([-1 1])
         xlabel('Time (seconds)','fontsize',15)
@@ -276,7 +308,7 @@ classdef PlottingClass
       end
       
       %% Save the figures
-      function Saving = Putintofiles(obj, thisone, thisplot)
+      function [] = Putintofiles(obj, thisone, thisplot)
         type = '.png';
         tog = strcat(obj.newname, thisplot, type);
         slash = '/';
