@@ -27,8 +27,9 @@ classdef PlottingClass
    end
    
    methods
+       %% Range Cook and Weber plots
        function setzone = setting(obj, data)
-            % create a time array
+           % create a time array
            time = linspace(0, 20, 1200000);
            % check if the starting range specified
            if obj.Range(1) ~= 0
@@ -49,8 +50,40 @@ classdef PlottingClass
            % return variable with range to plot
            setzone = zz;
        end
-       function [] = Perform(obj)
-           %% Fourier Domain - Cook and Weber      
+       %% Plot stemplots
+       function [] = stemplots(~, freq, ampspec, color, xtop, ytop, thistitle, thisxlabel, thisylabel)
+           stem(freq,ampspec, color);
+           xlim([0 xtop]);
+           ylim([0 ytop]);
+           title(thistitle,'fontsize',15);
+           xlabel(thisxlabel,'fontsize',15);
+           ylabel(thisylabel,'fontsize',15);
+           %set(gca,'Ydir','reverse')
+           set(gca,'FontSize',12);
+       end
+       
+       %% Plot db plots
+       function [] = dbplots(~, freq, db_spec, color, ybottom, xtop, ...
+               thistitle, thisxlabel, thisylabel)
+           plot(freq, db_spec, color);
+           ylim([ybottom 0]);
+           xlim([0 xtop]);
+           title(thistitle,'fontsize',15);
+           xlabel(thisxlabel,'fontsize',15);
+           ylabel(thisylabel,'fontsize',15);
+           set(gca,'FontSize',12);
+       end
+ 
+       function [freq, amp_spec, db_spec, n2] = fourier(~, variable, FoldingFreq)
+           Yy = fft(variable);
+           n2 = length(variable)/2;
+           n2 = ceil(n2);
+           freq = linspace(0, FoldingFreq, n2);
+           amp_spec = abs(Yy)/n2;
+           db_spec = mag2db(amp_spec);
+       end
+       %% Fourier Domain - Cook and Weber 
+       function [] = Perform(obj)     
            L = length(obj.R1);
            % the length will always have a certain delta t associated
            timestep = 1200 / L;
@@ -64,105 +97,78 @@ classdef PlottingClass
            
           
            
-           %% Linear Magnitude - Subsection (C&W)
+           %% Linear Magnitude (C&W)
+           
            subplot(2,2,1)
            % pass the object into setting method
            variable = obj.setting(obj.R1);
            
-           Yx = fft(variable);
-           n1 = length(variable)/2;
-           n1 = ceil(n1);
-           freq1 = linspace(0, FoldingFreq, n1);
-           amp_specx = abs(Yx)/n1;
-           db_spec1 = mag2db(amp_specx);
-           stem(freq1,amp_specx(1:n1), '-b');
-           xlim([0 100]);
-           ylim([0 0.05]);
-           title('Microphone 1: Roof','fontsize',15);
-           xlabel('Frequency (Hz)','fontsize',15);
-           ylabel('Linear Magnitude','fontsize',15);
-           %set(gca,'Ydir','reverse')
-           set(gca,'FontSize',12);
+           % pass into fourier calculator method
+           [freq1, amp_specx, db_spec1, n1] = ...
+               obj.fourier(variable, FoldingFreq);
+           
+           % plot the stemplots
+           thistitle = 'Microphone 1: Roof';
+           obj.stemplots(freq1, amp_specx(1:n1), '-b', 100, 0.05, ...
+               thistitle , 'Frequency (Hz)', 'Linear Magnitude')
       
            subplot(2,2,2)
            % pass the object into setting method
            variable2 = obj.setting(obj.R2);
            
-           Yy = fft(variable2);
-           n2 = length(variable2)/2;
-           n2 = ceil(n2);
-           freq2 = linspace(0,FoldingFreq,n2);
-           amp_specy = abs(Yy)/n2;
-           db_spec2 = mag2db(amp_specy);
-           stem(freq2,amp_specy(1:n2), '-g');
-           xlim([0 100]);
-           ylim([0 0.05]);
-           title('Microphone 2: South','fontsize',15);
-           xlabel('Frequency (Hz)','fontsize',15);
-           ylabel('Linear Magnitude','fontsize',15);
-           %set(gca,'Ydir','reverse')
-           set(gca,'FontSize',12);
+           % pass into fourier calculator method
+           [freq2, amp_specy, db_spec2, n2] = ...
+               obj.fourier(variable2, FoldingFreq);
+           
+           % plot the stemplot
+           thistitle = 'Microphone 2: South';
+           obj.stemplots(freq2, amp_specy(1:n2), '-g', 100, 0.05, ...
+               thistitle , 'Frequency (Hz)', 'Linear Magnitude')
 
            subplot(2,2,[3, 4])
            % pass the object into setting method
            variable3 = obj.setting(obj.R3);
            
-           Yz = fft(variable3);
-           n3 = length(variable3)/2;
-           n3 = ceil(n3);
-           freq3 = linspace(0,FoldingFreq,n3);
-           amp_specz = abs(Yz)/n3;
-           db_spec3 = mag2db(amp_specz);
-           stem(freq3,amp_specz(1:n3), '-r');
-           xlim([0 100]);
-           ylim([0 0.05]);
-           title('Microphone 3: North','fontsize',15);
-           xlabel('Frequency (Hz)','fontsize',15);
-           ylabel('Linear Magnitude','fontsize',15);
-           %set(gca,'Ydir','reverse')
-           set(gca,'FontSize',12);
+            % pass into fourier calculator method
+           [freq3, amp_specz, db_spec3, n3] = ...
+               obj.fourier(variable3, FoldingFreq);
+           
+          % plot the stemplot
+           thistitle = 'Microphone 3: North';
+           obj.stemplots(freq3, amp_specz(1:n3), '-r', 100, 0.05, ...
+               thistitle, 'Frequency (Hz)', 'Linear Magnitude')
            
            % save the figure
            thisplot = ' - freqdomain';
            obj.Putintofiles(thisone, thisplot);          
-           %% Decibal Magnitude
+           %% Decibal Magnitude (C&W)
            thisone2 = figure;
            set(thisone2, 'Visible', obj.figs);
            
            
            subplot(2,2,1)
-           plot(freq1, db_spec1(1:n1), '-b');
-           ylim([-200 0]);
-           xlim([0 100]);
-           title('Microphone 1: Roof','fontsize',15);
-           xlabel('Frequency (Hz)','fontsize',15);
-           ylabel('Decibal Magnitude (dB)','fontsize',15);
-           set(gca,'FontSize',12);
+           % pass data into plotdb
+           thistitle = 'Microphone 1: Roof';
+           obj.dbplots(freq1, db_spec1(1:n1), '-b', -200, 100, ...
+               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
       
            subplot(2,2,2)
-           plot(freq2, db_spec2(1:n2), '-g');
-           ylim([-200 0]);
-           xlim([0 100]);
-           title('Microphone 2: South','fontsize',15);
-           xlabel('Frequency (Hz)','fontsize',15);
-           ylabel('Decibal Magnitude (dB)','fontsize',15);
-           set(gca,'FontSize',12);
+           % pass data into plotdb
+           thistitle = 'Microphone 2: South';
+           obj.dbplots(freq2, db_spec2(1:n2), '-g', -200, 100, ...
+               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
 
            subplot(2,2,[3, 4])
-           plot(freq3, db_spec3(1:n3), '-r');
-           ylim([-200 0]);
-           xlim([0 100]);
-           title('Microphone 3: North','fontsize',15);
-           xlabel('Frequency (Hz)','fontsize',15);
-           ylabel('Decibal Magnitude (dB)','fontsize',15);
-           set(gca,'FontSize',12);
+           % pass data into plotdb
+           thistitle = 'Microphone 3: North';
+           obj.dbplots(freq3, db_spec3(1:n3), '-r', -200, 100, ...
+               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
            
            thisplot = ' - db';
            obj.Putintofiles(thisone2, thisplot);         
-       end
-       
+       end      
+      %% Lowpass filter (Butterworth) - Elbing 
       function [] = filtering(obj, s)
-          %% Lowpass filter (Butterworth) - Elbing
           
           fs = 1000;            % sample frequency
           
@@ -262,7 +268,7 @@ classdef PlottingClass
     thisplot = ' - spectra';
     obj.Putintofiles(h, thisplot);
       end
-        %% Raw Data - Cook and Hartzler
+      %% Raw Data - Cook and Hartzler
       function [] = Data(obj)
         time = .001:.001:1200;
 
