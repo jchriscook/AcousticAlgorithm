@@ -99,7 +99,6 @@ classdef PlottingClass
            %% Linear Magnitude (C&W)
            % this is a recursive function
            
-           
            subplot(2,2,1)
            % pass the object into setting method
            variable = obj.setting(obj.R1);
@@ -141,16 +140,19 @@ classdef PlottingClass
            
            if max(amp_specx(1:n1)) > obj.ytop
                obj.ytop = round(max(amp_specx(1:n1)), 1, 'significant');
-               %clf(thisone, 'reset');
-               obj.Perform()
+               clf(thisone, 'reset');
+               obj.Perform() 
+               return
            elseif max(amp_specy(1:n2)) > obj.ytop
                obj.ytop = round(max(amp_specy(1:n2)), 1, 'significant');
-               %clf(thisone, 'reset');
-               obj.Perform()
+               clf(thisone, 'reset');
+               obj.Perform() 
+               return
            elseif max(amp_specz(1:n3)) > obj.ytop
                obj.ytop = round(max(amp_specz(1:n3)), 1, 'significant');
-               %clf(thisone, 'reset');
-               obj.Perform()
+               clf(thisone, 'reset');
+               obj.Perform() 
+               return
            end
            
            % save the figure
