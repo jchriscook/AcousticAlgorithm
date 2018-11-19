@@ -24,8 +24,6 @@ classdef PlottingClass
       R1
       R2
       R3
-      % the ranged vals
-      Rset
    end
    
    methods
@@ -34,16 +32,19 @@ classdef PlottingClass
            time = linspace(0, 20, 1200000);
            
            if obj.Range(1) == 0
-               begin = 1;
+               begin = 0;
            else 
                begin = obj.Range(1);
+           end
+           start = begin * length(time);
+           if start == 0
+               start = 1;
            end
            
            if obj.Range(2) ~= 1
                close = obj.Range(2);
                stop = close * length(time);
            end
-           start = begin * length(time);
   
            if exist('stop') == 1
                zz = data(start:stop);
@@ -170,7 +171,7 @@ classdef PlottingClass
            obj.Putintofiles(thisone2, thisplot);         
        end
        
-      function [] = filtering(obj, s, name)
+      function [] = filtering(obj, s)
           %% Lowpass filter (Butterworth) - Elbing
           
           fs = 1000;            % sample frequency

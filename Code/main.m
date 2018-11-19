@@ -7,7 +7,7 @@ a = PlottingClass;
 date = '/18_11_14';
 file = '/11152018_000127_UTC.mat';
 % range
-a.Range = [0.25, 0.50];
+a.Range = [0, 1];
 % red lines
 a.right = [13,13];
 a.left = [8,8];
@@ -55,7 +55,7 @@ a.Data();
 all = rawdata(:,:);
 % call lowpass, filter and plot the data
 
-a.filtering(all, a.newname);
+a.filtering(all);
 
 % do some fft stuff
 a.Perform()
