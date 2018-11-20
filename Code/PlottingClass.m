@@ -137,12 +137,13 @@ classdef PlottingClass
            
            % filter out 60 Hz
            loc = find(freq3 == 60);
-           amp_specz(loc) = 0;
+           amp_specz(loc-15:loc+15) = 0;
            
+           new_amp = amp_specz;
            
           % plot the stemplot
            thistitle = 'Microphone 3: North';
-           obj.stemplots(freq3, amp_specz(1:n3), '-r', 100, obj.ytop, ...
+           obj.stemplots(freq3, new_amp(1:n3), '-r', 100, obj.ytop, ...
                thistitle, 'Frequency (Hz)', 'Linear Magnitude')
            
            if max(amp_specx(1:n1)) > obj.ytop
@@ -185,6 +186,10 @@ classdef PlottingClass
            subplot(2,2,[3, 4])
            % pass data into plotdb
            thistitle = 'Microphone 3: North';
+            % filter out 60 Hz
+           loc = find(freq3 == 60);
+           db_spec3(loc-50:loc+50) = mean(db_spec3);
+           
            obj.dbplots(freq3, db_spec3(1:n3), '-r', obj.cut, 100, ...
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)') 
            
@@ -203,7 +208,6 @@ classdef PlottingClass
            thisone22 = figure;
            set(thisone22, 'Visible', obj.figs);
            
-           
            subplot(2,2,1)
            % pass data into plotdb
            thistitle = 'Microphone 1: Roof';
@@ -219,6 +223,10 @@ classdef PlottingClass
            subplot(2,2,[3, 4])
            % pass data into plotdb
            thistitle = 'Microphone 3: North';
+            % filter out 60 Hz
+           loc = find(freq3 == 60);
+           db_spec3(loc-50:loc+50) = mean(db_spec3);
+           
            obj.dbplots(freq3, db_spec3(1:n3), '-r', obj.cut, 100, ...
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)') 
            
