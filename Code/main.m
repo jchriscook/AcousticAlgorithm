@@ -25,6 +25,7 @@ filename = strcat(date, file);
 
 % for recursion
 a.ytop = 0.04;
+a.cut = -200;
 
 % ------- Paths --------- %
 % path to dir with .mat

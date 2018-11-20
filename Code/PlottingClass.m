@@ -26,6 +26,8 @@ classdef PlottingClass
       R3
       % 
       ytop
+      % 
+      cut
    end
    
    methods
@@ -157,7 +159,7 @@ classdef PlottingClass
            
            % save the figure
            thisplot = ' - freqdomain';
-           obj.Putintofiles(thisone, thisplot);          
+           obj.Putintofiles(thisone, thisplot); 
            %% Decibal Magnitude (C&W)
            thisone2 = figure;
            set(thisone2, 'Visible', obj.figs);
@@ -166,23 +168,57 @@ classdef PlottingClass
            subplot(2,2,1)
            % pass data into plotdb
            thistitle = 'Microphone 1: Roof';
-           obj.dbplots(freq1, db_spec1(1:n1), '-b', -200, 100, ...
+           obj.dbplots(freq1, db_spec1(1:n1), '-b', obj.cut, 100, ...
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
       
            subplot(2,2,2)
            % pass data into plotdb
            thistitle = 'Microphone 2: South';
-           obj.dbplots(freq2, db_spec2(1:n2), '-g', -200, 100, ...
+           obj.dbplots(freq2, db_spec2(1:n2), '-g', obj.cut, 100, ...
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
 
            subplot(2,2,[3, 4])
            % pass data into plotdb
            thistitle = 'Microphone 3: North';
-           obj.dbplots(freq3, db_spec3(1:n3), '-r', -200, 100, ...
-               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
+           obj.dbplots(freq3, db_spec3(1:n3), '-r', obj.cut, 100, ...
+               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)') 
            
            thisplot = ' - db';
-           obj.Putintofiles(thisone2, thisplot);         
+           obj.Putintofiles(thisone2, thisplot); 
+           
+           %%
+           store = max(db_spec1(1:n1));
+           y = max(db_spec2(1:n2));
+           % for now ignore mic 3 because of 60 Hz interference
+           if y > store
+               store = y;
+           end
+           obj.cut = store - 42;
+           
+           thisone22 = figure;
+           set(thisone22, 'Visible', obj.figs);
+           
+           
+           subplot(2,2,1)
+           % pass data into plotdb
+           thistitle = 'Microphone 1: Roof';
+           obj.dbplots(freq1, db_spec1(1:n1), '-b', obj.cut, 100, ...
+               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
+      
+           subplot(2,2,2)
+           % pass data into plotdb
+           thistitle = 'Microphone 2: South';
+           obj.dbplots(freq2, db_spec2(1:n2), '-g', obj.cut, 100, ...
+               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
+
+           subplot(2,2,[3, 4])
+           % pass data into plotdb
+           thistitle = 'Microphone 3: North';
+           obj.dbplots(freq3, db_spec3(1:n3), '-r', obj.cut, 100, ...
+               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)') 
+           
+           thisplot = ' - db2';
+           obj.Putintofiles(thisone22, thisplot);   
        end      
       %% Lowpass filter (Butterworth) - Elbing 
       function [] = filtering(obj, s)
@@ -316,7 +352,7 @@ classdef PlottingClass
         ylabel('Pressure [Pa]','fontsize',15)
         set(gca,'FontSize',12);
 
-        thisplot = 'rawdata - ';
+        thisplot = ' - rawdata';
         obj.Putintofiles(l, thisplot);
         % end the plotting function
       end
