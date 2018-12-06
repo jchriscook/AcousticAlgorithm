@@ -14,7 +14,7 @@ a.right = [13,13];
 a.left = [8,8];
 
 % stem plot top
-a.ytop = 0.07;
+a.ytop = 0.05;
 
 % show figures or dont show figures
 show = 0;

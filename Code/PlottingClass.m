@@ -28,6 +28,7 @@ classdef PlottingClass
       cut
       % 
       Rguess
+      db_spec
    end
    
    methods
@@ -67,11 +68,11 @@ classdef PlottingClass
        end
        
        %% Plot db plots
-       function [] = dbplots(~, freq, db_spec, color, ybottom, xtop, ...
-               thistitle, thisxlabel, thisylabel)
+       function [] = dbplots(~, freq, db_spec, color, ybottom, ytop, ...
+               xbottom, xtop, thistitle, thisxlabel, thisylabel)
            plot(freq, db_spec, color);
-           ylim([ybottom 0]);
-           xlim([0 xtop]);
+           ylim([ybottom ytop]);
+           xlim([xbottom xtop]);
            title(thistitle,'fontsize',15);
            xlabel(thisxlabel,'fontsize',15);
            ylabel(thisylabel,'fontsize',15);
@@ -83,7 +84,7 @@ classdef PlottingClass
            n2 = length(variable)/2;
            n2 = ceil(n2);
            freq = linspace(0, FoldingFreq, n2);
-           amp_spec = abs(Yy)/n2;
+           amp_spec = abs(Yy)/n2;         
            db_spec = mag2db(amp_spec);
        end
        %% Fourier Domain - Cook and Weber 
@@ -174,13 +175,13 @@ classdef PlottingClass
            subplot(2,2,1)
            % pass data into plotdb
            thistitle = 'Microphone 1: Roof';
-           obj.dbplots(freq1, db_spec1(1:n1), '-b', obj.cut, 100, ...
+           obj.dbplots(freq1, db_spec1(1:n1), '-b', obj.cut, 0, 0, 100, ...
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
       
            subplot(2,2,2)
            % pass data into plotdb
            thistitle = 'Microphone 2: South';
-           obj.dbplots(freq2, db_spec2(1:n2), '-k', obj.cut, 100, ...
+           obj.dbplots(freq2, db_spec2(1:n2), '-k', obj.cut, 0, 0, 100, ...
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
 
            subplot(2,2,[3, 4])
@@ -190,11 +191,54 @@ classdef PlottingClass
            loc = find(freq3 == 60);
            db_spec3(loc-50:loc+50) = mean(db_spec3);
            
-           obj.dbplots(freq3, db_spec3(1:n3), '-r', obj.cut, 100, ...
-               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)') 
+           obj.dbplots(freq3, db_spec3(1:n3), '-r', obj.cut, 0, 0, 100, ...
+               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
            
            thisplot = ' - db';
            obj.Putintofiles(thisone2, thisplot); 
+           
+           thisone_2 = figure;
+           set(thisone_2, 'Visible', obj.figs);
+           plot(freq1, db_spec1(1:n1), '-b', freq2, db_spec2(1:n2), '-k', ...
+               freq3, db_spec3(1:n3), '-r');
+           xlim([0, 100])
+           thisplot = ' - db22';
+           obj.Putintofiles(thisone_2, thisplot);
+           %% Coherence - Cook
+           thisone2_2 = figure;
+           set(thisone2_2, 'Visible', obj.figs);
+           
+           %subplot(2,2,1)
+           % * Mic 1 to Mic 2
+           thistitle = 'Coherence between Mic 1 & 2';
+           [cxy12, f12] = mscohere(obj.R1, obj.R2, [], [], [], 1000);
+           obj.dbplots(f12, cxy12, '-b', 0, 1, 0, 100, ...
+               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
+           thisplot = ' - cxy12';
+           obj.Putintofiles(thisone2_2, thisplot);
+           
+           thisone2_22 = figure;
+           set(thisone2_22, 'Visible', obj.figs);
+           % subplot(2,2,2)
+           % * Mic 2 to Mic 3
+           thistitle = 'Coherence between Mic 2 & 3';
+           [cxy23, f23] = mscohere(obj.R2, obj.R3, [], [], [], 1000);
+           obj.dbplots(f23, cxy23, '-k', 0, 1, 0, 100, ...
+               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
+           thisplot = ' - cxy23';
+           obj.Putintofiles(thisone2_22, thisplot);
+           
+           thisone2_223 = figure;
+           set(thisone2_223, 'Visible', obj.figs);
+           % subplot(2,2,[3, 4])
+           % * Mic 3 to Mic 1
+           thistitle = 'Coherence between Mic 3 & 1';
+           [cxy31, f31] = mscohere(obj.R3, obj.R1, [], [], [], 1000);
+           obj.dbplots(f31, cxy31, '-r', 0, 1, 0, 100, ...
+               thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
+           
+           thisplot = ' - cxy31';
+           obj.Putintofiles(thisone2_223, thisplot);
            %% Cook
            store = max(db_spec1(1:n1));
            y = max(db_spec2(1:n2));
@@ -222,13 +266,13 @@ classdef PlottingClass
            subplot(2,2,1)
            % pass data into plotdb
            thistitle = 'Microphone 1: Roof';
-           obj.dbplots(freq1, db_spec1(1:n1), '-b', obj.cut, 100, ...
+           obj.dbplots(freq1, db_spec1(1:n1), '-b', obj.cut, 0, 0, 100, ...
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
       
            subplot(2,2,2)
            % pass data into plotdb
            thistitle = 'Microphone 2: South';
-           obj.dbplots(freq2, db_spec2(1:n2), '-k', obj.cut, 100, ...
+           obj.dbplots(freq2, db_spec2(1:n2), '-k', obj.cut, 0, 0, 100, ...
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
 
            subplot(2,2,[3, 4])
@@ -238,7 +282,7 @@ classdef PlottingClass
            loc = find(freq3 == 60);
            db_spec3(loc-50:loc+50) = mean(db_spec3);
            
-           obj.dbplots(freq3, db_spec3(1:n3), '-r', obj.cut, 100, ...
+           obj.dbplots(freq3, db_spec3(1:n3), '-r', obj.cut, 0, 0, 100, ...
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)') 
            
            thisplot = ' - db2';
@@ -385,8 +429,6 @@ classdef PlottingClass
         xlabel('Time (seconds)','fontsize',15)
         ylabel('Pressure [Pa]','fontsize',15)
         set(gca,'FontSize',12);
-        z = max(obj.R2(500000:700000))
-        zz = length(obj.R2)
 
         subplot(2,2,2);
         plot(time, obj.R2, '-k')
@@ -407,15 +449,28 @@ classdef PlottingClass
         thisplot = ' - rawdata';
         obj.Putintofiles(l, thisplot);
         % end the plotting function
+        r1 = mean(abs(obj.R1(400000:600000)))
+        r2 = mean(abs(obj.R2(400000:600000)))
+        r3 = mean(abs(obj.R3(400000:600000)))
         
-        a1 = mean(obj.R1);
-        b2 = mean(obj.R2);
-        c3 = mean(obj.R3);
+        r12 = r1 / r2
+        r13 = r1 / r3
         
-        t = 500;
-        aa1 = obj.R1(t);
-        aa2 = obj.R2(t);
-        aa3 = obj.R3(t);
+        l2 = figure;
+        set(l2, 'Visible', obj.figs);
+        plot(time, obj.R1, '-b', ...
+            time, obj.R3, '-r', time, obj.R2, '-k')
+        ylim([-1 1])
+        xlabel('Time (seconds)','fontsize',15)
+        ylabel('Pressure [Pa]','fontsize',15)
+        title('Difference in Pressure', 'fontsize',15)
+
+    
+        legend({'Microphone 1: Roof', 'Microphone 2: South', ...
+            'Microphone 3: North'}, 'location', 'northeast')
+        set(gca,'FontSize',12);
+        thisplot = ' - rawdata - all';
+        obj.Putintofiles(l2, thisplot);
         
         
       end
