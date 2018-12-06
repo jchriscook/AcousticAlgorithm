@@ -1,16 +1,20 @@
+%% Main.m for PlottingClass
 % initialize the class
 a = PlottingClass;
 
 
 % ------------ Inputs ------------- %
 % name of current .mat to be processed
-date = '/18_11_14';
-file = '/11152018_000127_UTC.mat';
+date = '/18_11_20';
+file = '/11202018_200547_UTC.mat';
 % range
 a.Range = [0.25, 0.50];
 % red lines
 a.right = [13,13];
 a.left = [8,8];
+
+% stem plot top
+a.ytop = 0.07;
 
 % show figures or dont show figures
 show = 0;
@@ -23,9 +27,10 @@ end
 
 filename = strcat(date, file);
 
-% for recursion
-a.ytop = 0.04;
 a.cut = -200;
+
+% guess radius
+a.Rguess = 5;
 
 % ------- Paths --------- %
 % path to dir with .mat

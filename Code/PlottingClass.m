@@ -1,5 +1,6 @@
+%% PlotingClass.m
+% a class def file which has to be the same name as the file
 classdef PlottingClass
-    % a class def file which has to be the same name as the file
    properties
       % the path to the directory
       path
@@ -7,8 +8,6 @@ classdef PlottingClass
       filename
       % the entire filepath
       filepath
-      % the data points of the .mat
-      rawdata
       % name for saving plots
       newname
       % location for the images
@@ -16,18 +15,19 @@ classdef PlottingClass
       % the range of the data to view
       Range
       % the locations of the red vertical lines
-      left
-      right
+      left; right
       % for whether or not to open figures
       figs
+      % the data points of the .mat
+      rawdata
       % the data of the microphones
-      R1
-      R2
-      R3
+      R1; R2; R3
       % 
       ytop
       % 
       cut
+      % 
+      Rguess
    end
    
    methods
@@ -124,7 +124,7 @@ classdef PlottingClass
            
            % plot the stemplot
            thistitle = 'Microphone 2: South';
-           obj.stemplots(freq2, amp_specy(1:n2), '-g', 100, obj.ytop, ...
+           obj.stemplots(freq2, amp_specy(1:n2), '-k', 100, obj.ytop, ...
                thistitle , 'Frequency (Hz)', 'Linear Magnitude')
 
            subplot(2,2,[3, 4])
@@ -146,22 +146,22 @@ classdef PlottingClass
            obj.stemplots(freq3, new_amp(1:n3), '-r', 100, obj.ytop, ...
                thistitle, 'Frequency (Hz)', 'Linear Magnitude')
            
-           if max(amp_specx(1:n1)) > obj.ytop
-               obj.ytop = round(max(amp_specx(1:n1)), 1, 'significant');
-               clf(thisone, 'reset');
-               obj.Perform() 
-               return
-           elseif max(amp_specy(1:n2)) > obj.ytop
-               obj.ytop = round(max(amp_specy(1:n2)), 1, 'significant');
-               clf(thisone, 'reset');
-               obj.Perform() 
-               return
-           elseif max(amp_specz(1:n3)) > obj.ytop
-               obj.ytop = round(max(amp_specz(1:n3)), 1, 'significant');
-               clf(thisone, 'reset');
-               obj.Perform() 
-               return
-           end
+%            if max(amp_specx(1:n1)) > obj.ytop
+%                obj.ytop = round(max(amp_specx(1:n1)), 1, 'significant');
+%                clf(thisone, 'reset');
+%                obj.Perform() 
+%                return
+%            elseif max(amp_specy(1:n2)) > obj.ytop
+%                obj.ytop = round(max(amp_specy(1:n2)), 1, 'significant');
+%                clf(thisone, 'reset');
+%                obj.Perform() 
+%                return
+%            elseif max(amp_specz(1:n3)) > obj.ytop
+%                obj.ytop = round(max(amp_specz(1:n3)), 1, 'significant');
+%                clf(thisone, 'reset');
+%                obj.Perform() 
+%                return
+%            end
            
            % save the figure
            thisplot = ' - freqdomain';
@@ -180,7 +180,7 @@ classdef PlottingClass
            subplot(2,2,2)
            % pass data into plotdb
            thistitle = 'Microphone 2: South';
-           obj.dbplots(freq2, db_spec2(1:n2), '-g', obj.cut, 100, ...
+           obj.dbplots(freq2, db_spec2(1:n2), '-k', obj.cut, 100, ...
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
 
            subplot(2,2,[3, 4])
@@ -195,15 +195,26 @@ classdef PlottingClass
            
            thisplot = ' - db';
            obj.Putintofiles(thisone2, thisplot); 
-           
-           %%
+           %% Cook
            store = max(db_spec1(1:n1));
            y = max(db_spec2(1:n2));
-           % for now ignore mic 3 because of 60 Hz interference
-           if y > store
-               store = y;
+           % mic 3 coded out for interference
+           if max(db_spec1(1:n1)) > max(db_spec2(1:n2))
+               store = max(db_spec1(1:n1));
+               loc = find(db_spec1(1:n1) == max(db_spec1(1:n1)));
+           elseif max(db_spec2(1:n2)) > max(db_spec3(1:n3))
+               store = max(db_spec2(1:n2));
+               loc = find(db_spec2(1:n2) == max(db_spec2(1:n2)));
+           else
+               store = max(db_spec3(1:n3));
+               loc = find(db_spec3(1:n3) == max(db_spec3(1:n3)));
            end
+           
            obj.cut = store - 42;
+           % get the decibal magnitudes
+           db_1 = db_spec1(loc);
+           db_2 = db_spec2(loc);
+           db_3 = db_spec3(loc);
            
            thisone22 = figure;
            set(thisone22, 'Visible', obj.figs);
@@ -217,7 +228,7 @@ classdef PlottingClass
            subplot(2,2,2)
            % pass data into plotdb
            thistitle = 'Microphone 2: South';
-           obj.dbplots(freq2, db_spec2(1:n2), '-g', obj.cut, 100, ...
+           obj.dbplots(freq2, db_spec2(1:n2), '-k', obj.cut, 100, ...
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)')
 
            subplot(2,2,[3, 4])
@@ -231,8 +242,34 @@ classdef PlottingClass
                thistitle, 'Frequency (Hz)', 'Decibal Magnitude (dB)') 
            
            thisplot = ' - db2';
-           obj.Putintofiles(thisone22, thisplot);   
-       end      
+           obj.Putintofiles(thisone22, thisplot);  
+           
+           obj.Spherical(db_1, db_2, db_3)
+       end   
+       
+       %% Cook 
+       % Special thanks to Doctor Joe Conner and Doctor Ronald Delahoussaye
+       function [] = Spherical(obj, db_1, db_2, db_3)
+           
+           % mic 1-2
+           a = 67.6;  %m
+           % mic 2-3
+           b = 58.5;  %m
+           % mic 3-1
+           c = 58.6;  %m
+           % angle A - mic 3
+           A = acos((c^2 + b^2 - a^2) / (2 * c * b));
+           C = acos((a^2 + b^2 - c^2) / (2 * a * b));
+           cA = cos(C) * a;
+           % perpendicular line to 1
+           bA = cos(A) * c;
+           x = sqrt(c^2 - bA^2);
+           y = sqrt(a^2 - x^2);
+           % 1/2 angle B at mic 1 
+           radius = a / (2 * sin(A)) + 1;
+       end
+          
+      
       %% Lowpass filter (Butterworth) - Elbing 
       function [] = filtering(obj, s)
           
@@ -336,7 +373,7 @@ classdef PlottingClass
       end
       %% Raw Data - Cook and Hartzler
       function [] = Data(obj)
-        time = .001:.001:1200;
+        time = 0.001:.001:1200;
 
         l = figure;
         set(l, 'Visible', obj.figs);
@@ -348,9 +385,11 @@ classdef PlottingClass
         xlabel('Time (seconds)','fontsize',15)
         ylabel('Pressure [Pa]','fontsize',15)
         set(gca,'FontSize',12);
+        z = max(obj.R2(500000:700000))
+        zz = length(obj.R2)
 
         subplot(2,2,2);
-        plot(time, obj.R2, '-g')
+        plot(time, obj.R2, '-k')
         title('Microphone 2: South', 'fontsize',15)
         ylim([-1 1])
         xlabel('Time (seconds)','fontsize',15)
@@ -368,6 +407,17 @@ classdef PlottingClass
         thisplot = ' - rawdata';
         obj.Putintofiles(l, thisplot);
         % end the plotting function
+        
+        a1 = mean(obj.R1);
+        b2 = mean(obj.R2);
+        c3 = mean(obj.R3);
+        
+        t = 500;
+        aa1 = obj.R1(t);
+        aa2 = obj.R2(t);
+        aa3 = obj.R3(t);
+        
+        
       end
       %% Save the figures
       function [] = Putintofiles(obj, thisone, thisplot)
