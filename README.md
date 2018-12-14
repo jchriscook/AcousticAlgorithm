@@ -1,4 +1,6 @@
 # AcousticAlgorithm
+!! This code has an open source Copyright License and must be cited if used !!
+
 A repository for locating tornados during development
 
 
